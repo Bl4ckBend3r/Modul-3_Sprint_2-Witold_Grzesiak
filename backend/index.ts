@@ -1,11 +1,27 @@
-import { createServer } from 'http';
+import { createServer } from "http";
+import { readFile } from "fs/promises";
+import { join } from "path";
 
-const PORT = 3000;
+const PORT = 4000;
+
 const server = createServer(async (req, res) => {
-  res.end(JSON.stringify({ status: 'ok'}))
+  res.setHeader("Content-Type", "application/json");
 
-  // 1. Obsługa endpointów
-  // 2. Proste serwowanie plików statycznych z katalogu frontend (np. pod ścieżką /static/)
+  // GET /users
+  if (req.url === "/users" && req.method === "GET") {
+    try {
+      const users = await readFile(join("db", "users.json"), "utf-8");
+      res.end(users);
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: "Failed to read users" }));
+    }
+    return;
+  }
+
+  // fallback 404
+  res.statusCode = 404;
+  res.end(JSON.stringify({ error: "Not found" }));
 });
 
 server.listen(PORT, () => {
