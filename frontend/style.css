@@ -1,0 +1,83 @@
+/* Podstawowe style */
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background: #f7f7f7;
+  }
+  
+  header {
+    background: #333;
+    color: #fff;
+    padding: 10px;
+  }
+  
+  header h1 {
+    margin: 0;
+  }
+  
+  nav ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  nav li {
+    display: inline;
+    margin-right: 15px;
+  }
+  
+  nav a {
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  #user-info {
+    margin-top: 5px;
+    font-size: 0.9em;
+  }
+  
+  /* Widoki */
+  .view {
+    background: #fff;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 4px;
+  }
+  
+  /* Style formularzy i przycisków */
+  input, button {
+    padding: 8px;
+    margin: 5px;
+  }
+  
+  /* Komunikaty */
+  #message {
+    padding: 10px;
+    margin: 10px 0;
+  }
+  
+  #message.success {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  #message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  
+  /* Powiadomienia */
+  #notification {
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #cce5ff;
+    color: #004085;
+    border: 1px solid #b8daff;
+    border-radius: 4px;
+  }
+  
+  /* Dodatkowy styl dla elementów listy samochodów */
+  .car-item {
+    border-bottom: 1px solid #ccc;
+    padding: 5px 0;
+  }
+  
