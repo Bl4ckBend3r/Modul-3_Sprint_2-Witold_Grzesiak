@@ -12,5 +12,12 @@
     "password": "1234",
     "role": "user",
     "balance": 0
+  },
+  {
+    "id": "9104fb94-2e5a-432a-9a6d-20e2416c2868",
+    "username": "witek",
+    "password": "1234",
+    "role": "user",
+    "balance": 0
   }
 ]

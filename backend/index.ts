@@ -19,6 +19,20 @@ async function loadJSON(file: string) {
 async function saveJSON(file: string, data: any[]) {
   await writeFile(file, JSON.stringify(data, null, 2), "utf-8");
 }
+function parseBody(req: any): Promise<any | null> {
+  return new Promise(resolve => {
+    let body = "";
+    req.on("data", (chunk: any) => (body += chunk));
+    req.on("end", () => {
+      try {
+        const parsed = JSON.parse(body);
+        resolve(parsed);
+      } catch {
+        resolve(null);
+      }
+    });
+  });
+}
 
 const server = createServer(async (req, res) => {
   res.setHeader("Content-Type", "application/json");
@@ -35,27 +49,27 @@ const server = createServer(async (req, res) => {
   //
   // POST /users
   //
-  if (req.url === "/users" && req.method === "POST") {
-    let body = "";
-    req.on("data", chunk => (body += chunk));
-    req.on("end", async () => {
-      const data = JSON.parse(body);
-      const users = await loadJSON(usersFile);
+ if (req.url === "/users" && req.method === "POST") {
+    const data = await parseBody(req);
+    if (!data || typeof data.username !== "string" || typeof data.password !== "string") {
+      res.statusCode = 400;
+      res.end(JSON.stringify({ success: false, error: "Invalid user data" }));
+      return;
+    }
 
-      const newUser = {
-        id: randomUUID(),
-        username: data.username,
-        password: data.password,
-        role: "user",
-        balance: 0,
-      };
+    const users = await loadJSON(usersFile);
+    const newUser = {
+      id: randomUUID(),
+      username: data.username,
+      password: data.password,
+      role: "user",
+      balance: 0,
+    };
+    users.push(newUser);
+    await saveJSON(usersFile, users);
 
-      users.push(newUser);
-      await saveJSON(usersFile, users);
-
-      res.statusCode = 201;
-      res.end(JSON.stringify(newUser));
-    });
+    res.statusCode = 201;
+    res.end(JSON.stringify(newUser));
     return;
   }
   //
@@ -64,23 +78,24 @@ const server = createServer(async (req, res) => {
 
   if (req.url?.startsWith("/users/") && req.method === "PUT") {
     const id = req.url.split("/")[2];
-    let body = "";
-    req.on("data", chunk => (body += chunk));
-    req.on("end", async () => {
-      const data = JSON.parse(body);
-      const users = await loadJSON(usersFile);
-      const idx = users.findIndex((u: any) => u.id === id);
+    const data = await parseBody(req);
+    if (!data) {
+      res.statusCode = 400;
+      res.end(JSON.stringify({ success: false, error: "Invalid JSON" }));
+      return;
+    }
 
-      if (idx === -1) {
-        res.statusCode = 404;
-        res.end(JSON.stringify({ error: "User not found" }));
-        return;
-      }
+    const users = await loadJSON(usersFile);
+    const idx = users.findIndex((u: any) => u.id === id);
+    if (idx === -1) {
+      res.statusCode = 404;
+      res.end(JSON.stringify({ success: false, error: "User not found" }));
+      return;
+    }
 
-      users[idx] = { ...users[idx], ...data };
-      await saveJSON(usersFile, users);
-      res.end(JSON.stringify(users[idx]));
-    });
+    users[idx] = { ...users[idx], ...data };
+    await saveJSON(usersFile, users);
+    res.end(JSON.stringify(users[idx]));
     return;
   }
 
@@ -94,7 +109,7 @@ const server = createServer(async (req, res) => {
 
     if (filtered.length === users.length) {
       res.statusCode = 404;
-      res.end(JSON.stringify({ error: "User not found" }));
+      res.end(JSON.stringify({ success: false, error: "User not found" }));
       return;
     }
 
@@ -116,26 +131,26 @@ const server = createServer(async (req, res) => {
   //
   // POST /cars
   //
-  if (req.url === "/cars" && req.method === "POST") {
-    let body = "";
-    req.on("data", chunk => (body += chunk));
-    req.on("end", async () => {
-      const data = JSON.parse(body);
-      const cars = await loadJSON(carsFile);
+ if (req.url === "/cars" && req.method === "POST") {
+    const data = await parseBody(req);
+    if (!data || typeof data.model !== "string" || typeof data.price !== "number" || typeof data.ownerId !== "string") {
+      res.statusCode = 400;
+      res.end(JSON.stringify({ success: false, error: "Invalid car data" }));
+      return;
+    }
 
-      const newCar = {
-        id: randomUUID(),
-        model: data.model,
-        price: data.price,
-        ownerId: data.ownerId,
-      };
+    const cars = await loadJSON(carsFile);
+    const newCar = {
+      id: randomUUID(),
+      model: data.model,
+      price: data.price,
+      ownerId: data.ownerId,
+    };
+    cars.push(newCar);
+    await saveJSON(carsFile, cars);
 
-      cars.push(newCar);
-      await saveJSON(carsFile, cars);
-
-      res.statusCode = 201;
-      res.end(JSON.stringify(newCar));
-    });
+    res.statusCode = 201;
+    res.end(JSON.stringify(newCar));
     return;
   }
   //
@@ -145,23 +160,24 @@ const server = createServer(async (req, res) => {
 
   if (req.url?.startsWith("/cars/") && req.method === "PUT") {
     const id = req.url.split("/")[2];
-    let body = "";
-    req.on("data", chunk => (body += chunk));
-    req.on("end", async () => {
-      const data = JSON.parse(body);
-      const cars = await loadJSON(carsFile);
-      const idx = cars.findIndex((c: any) => c.id === id);
+    const data = await parseBody(req);
+    if (!data) {
+      res.statusCode = 400;
+      res.end(JSON.stringify({ success: false, error: "Invalid JSON" }));
+      return;
+    }
 
-      if (idx === -1) {
-        res.statusCode = 404;
-        res.end(JSON.stringify({ error: "Car not found" }));
-        return;
-      }
+    const cars = await loadJSON(carsFile);
+    const idx = cars.findIndex((c: any) => c.id === id);
+    if (idx === -1) {
+      res.statusCode = 404;
+      res.end(JSON.stringify({ success: false, error: "Car not found" }));
+      return;
+    }
 
-      cars[idx] = { ...cars[idx], ...data };
-      await saveJSON(carsFile, cars);
-      res.end(JSON.stringify(cars[idx]));
-    });
+    cars[idx] = { ...cars[idx], ...data };
+    await saveJSON(carsFile, cars);
+    res.end(JSON.stringify(cars[idx]));
     return;
   }
   //
@@ -175,7 +191,7 @@ const server = createServer(async (req, res) => {
 
     if (filtered.length === cars.length) {
       res.statusCode = 404;
-      res.end(JSON.stringify({ error: "Car not found" }));
+      res.end(JSON.stringify({ success: false, error: "Car not found" }));
       return;
     }
 
@@ -189,7 +205,7 @@ const server = createServer(async (req, res) => {
   // fallback
   //
   res.statusCode = 404;
-  res.end(JSON.stringify({ error: "Not found" }));
+  res.end(JSON.stringify({ success: false, error: "Not found" }));
 });
 
 server.listen(PORT, () => {
