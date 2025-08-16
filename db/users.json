@@ -1,10 +1,16 @@
 [
-    {
-      "id": "admin001",
-      "username": "admin",
-      "password": "admin123",
-      "role": "admin",
-      "balance": 10000
-    }
-  ]
-  
+  {
+    "id": "admin001",
+    "username": "admin",
+    "password": "admin123",
+    "role": "admin",
+    "balance": 10000
+  },
+  {
+    "id": "c86be338-b35a-468e-a9d6-0aaa72a77b65",
+    "username": "witek",
+    "password": "1234",
+    "role": "user",
+    "balance": 0
+  }
+]
