@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "id": "0d6a2dcf-0ac6-4dd9-9595-a8241d691fbe",
+    "model": "Audi A4",
+    "price": 750,
+    "ownerId": "admin001"
+  },
+  {
+    "id": "bbd90b83-16c9-4f58-a6c5-60e154f04bc6",
+    "model": "audi a4",
+    "price": 600,
+    "ownerId": "83d4597b-e755-49cc-9152-f3d195865bd5"
+  }
+]
